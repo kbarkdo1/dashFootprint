@@ -21,22 +21,42 @@
 
             <py-script>  
                 from pyodide.http import open_url
-                filepath = open_url('https://raw.githubusercontent.com/')
-                #filepath = "data/ItemsCF.csv"
-                file = open(filepath)
+                file = open_url('https://raw.githubusercontent.com/kbarkdo1/dashFootprint/main/data/ItemsCF.csv')
 
                 # List of lists defining main ingredient and Carbon Footprint
                     # [0] = main ingredient
                     # [1] = CF
-                item_CF = []
+                item_cf = []
 
                 for line in file:
                     line = line.strip().split(",")
                     item = line[3]
                     cf = line[5]
-                    item_CF.append([item, cf])
+                    item_cf.append([item, cf])
 
-                print(item_CF)
+                item_cf = item_cf[2:] 
+
+                #print("Food item, Carbon Footprint")
+                #for line in item_CF:
+                    #print("%s, %s" % (line[0], line[1]))
+
+
+                file2 = open_url('https://raw.githubusercontent.com/kbarkdo1/dashFootprint/main/data/MenuItem.csv')
+                sharps_menu = []
+
+                for line in file2:
+                    line = line.strip().split(",")
+                    meal = line[0]
+                    main = line[1]
+                    sharps_menu.append([meal, main])
+
+                print("Food item | Carbon Footprint")
+                print("---------------------------")
+                for item in item_cf:
+                    for meal in sharps_menu:
+                        if meal[1] in item:
+                            print("%s, %s" % (meal[0], item[1]))
+
             </py-script>
 
         </div>
