@@ -1,20 +1,46 @@
 body {
     margin: 0;
     text-align: center;
-  }
-  
-  #title {
-    text-align: center;
-    color: white;
-    font-size: large;
-    font-family: Georgia, "Times New Roman", Times, serif;
+    /*border: 1px solid yellow;*/
   }
 
-  #banner {
-    display: flex;
-    background-color: #3cb023;
-    /*background-color: #028a0f;*/
-    margin-top: 0px;
-    height: 50px;
-    font-family: Georgia, "Times New Roman", Times, serif;
+  h2.larger {
+    font-size: 25px;
+    color: white;
+    -webkit-text-stroke-width: 1px;
+    -webkit-text-stroke-color: #333333;
   }
+
+  #homepage {
+    overflow-y: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: flex-start;
+    height: 100vh;
+    /* border: 10px solid green; */
+  }
+
+#title {
+    width: 100%;
+    height: 8%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #3cb023;
+    position: relative;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    /*border: 1px solid black;*/
+}
+
+#data_display {
+    width: 100%;
+    height: 8%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background-color: #3cb023;
+    position: relative;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    /*border: 1px solid black;*/
+}
