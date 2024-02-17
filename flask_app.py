@@ -1,4 +1,7 @@
 from flask import Flask, render_template
+import openai
+from dotenv import load_dotenv
+import os
 
 app = Flask(__name__)
 
@@ -14,6 +17,7 @@ def index():
 def read_csv():
     return
 
+@app.route('/openai_api', methods=['GET', 'POST'])
 def openai_api():
 
     # user prompt
