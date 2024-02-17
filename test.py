@@ -1,18 +1,21 @@
-from flask import Flask, render_template
+from flask import Flask, request, jsonify
+# from flask_limiter import Limiter
+# from flask_limiter.util import get_remote_address
+import openai
+from dotenv import load_dotenv
+import os
+# from flask_cors import CORS
 
-app = Flask(__name__)
+# limiter = Limiter(app)
 
+
+# load env variables from .env file
 load_dotenv()
 
-@app.route('/', methods=['GET', 'POST'])
-@app.route('/home', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
-def index():
-    return render_template('index.html')
+openai.api_key = os.getenv("OPENAI_API_KEY")
+# @app.route('/', methods=['POST'])
+# @limiter.limit("15 per minute")
 
-
-def read_csv():
-    return
 
 def openai_api():
 
@@ -55,5 +58,4 @@ def openai_api():
         return jsonify(error=f"{e}"), 500
 
 
-if __name__ == '__main__':
-    app.run()
+openai_api()
