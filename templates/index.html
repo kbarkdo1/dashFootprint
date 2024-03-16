@@ -18,7 +18,11 @@
         <div id="data_content">
             <b> <p class="edit"> Here is the data regarding CO2 emissions of the foods
                 we consume on Swarthmore's Campus as indicated by the data on the Dash: </p> </b>
-
+                
+            <b>
+                {% title %}
+            </b>
+            
             <py-script>  
                 from pyodide.http import open_url
                 file = open_url('https://raw.githubusercontent.com/kbarkdo1/dashFootprint/main/data/ItemsCF.csv')

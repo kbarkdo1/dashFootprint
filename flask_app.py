@@ -1,7 +1,8 @@
-from flask import Flask, render_template
+from flask import Flask, request, jsonify, render_template
 import openai
 from dotenv import load_dotenv
 import os
+import requests as rq
 
 app = Flask(__name__)
 
@@ -11,7 +12,17 @@ load_dotenv()
 @app.route('/home', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
-    return render_template('index.html')
+
+    response = rq.get("https://dash.swarthmore.edu/dining_json")
+    ingredients = response.json()
+    print(ingredients['sharples'][0]['title'])
+
+    if (ingredients['sharples'][0]['title'] == "Closed"):
+        return render_template('sharplesClosed.html')
+    
+    
+
+    return render_template('index.html', title = ingredients['sharples'][0]['title'])
 
 
 def read_csv():
