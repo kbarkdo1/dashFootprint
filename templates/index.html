@@ -19,9 +19,11 @@
             <b> <p class="edit"> Here is the data regarding CO2 emissions of the foods
                 we consume on Swarthmore's Campus as indicated by the data on the Dash: </p> </b>
                 
-            <b>
-                {% title %}
-            </b>
+                <div>
+                    {% if True %}
+                        {{title + "\n"}}
+                    {% endif %}
+                </div>
             
             <py-script>  
                 from pyodide.http import open_url

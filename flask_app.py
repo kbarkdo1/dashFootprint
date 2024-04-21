@@ -1,28 +1,98 @@
 from flask import Flask, request, jsonify, render_template
-import openai
+from openai import OpenAI
+
+client = OpenAI()
 from dotenv import load_dotenv
 import os
 import requests as rq
+import json
+
+MENURESPONSE = None
 
 app = Flask(__name__)
 
 load_dotenv()
 
+def get_completion(prompt): 
+
+
+
+    print("in get_completion")
+    '''try:
+        print("in try")
+
+        print(type(response))
+
+        # generated_text = response.json().get('generated_text')
+
+        # Return the generated text as JSON response
+        # return {"response": response}
+        # return response
+    except Exception as e:
+        return render_template('apiError.html', code="Sharples is currently closed. Data will be displayed at meal time.")
+        return jsonify(error=f"{e}"), 500
+    print(type(response))'''
+
+    # print(prompt) 
+
+    CONTENT = "I will provide you with a JSON that contains key-value pairs where the values are lists of menu items. You will return to me a json file, with no other text, where the keys are the same keys from the json i give you and the values are lists of tuples, where in each tuple the first element is the element from the list of the first json file, and the second element is the primary ingredient used in making the first element."
+    PREFIX = "I will provide you with a JSON that contains key-value pairs where the values are lists of menu items. You will return to me a json file, with no other text, where the keys are the same keys from the json i give you and the values are lists of tuples, where in each tuple the first element is the element from the list of the first json file, and the second element is the primary ingredient used in making the first element. Here is the json:"
+    prompt = PREFIX + str(prompt)
+    MODEL = "gpt-3.5-turbo"
+    response = client.chat.completions.create(model=MODEL,
+    response_format={ "type": "json_object" },
+    messages=[
+        {"role": "system", "content": CONTENT},
+        {"role": "user", "content": prompt}
+    ],
+    temperature=0)
+
+    textResponse = response.choices[0].message.content
+    print("text response type is: ", type(textResponse))
+    return textResponse
+
+
 @app.route('/', methods=['GET', 'POST'])
-@app.route('/home', methods=['GET', 'POST'])
-@app.route('/index', methods=['GET', 'POST'])
+# @app.route('/home', methods=['GET', 'POST'])
+# @app.route('/index', methods=['GET', 'POST'])
 def index():
 
-    response = rq.get("https://dash.swarthmore.edu/dining_json")
-    ingredients = response.json()
-    print(ingredients['sharples'][0]['title'])
+    global MENURESPONSE
 
-    if (ingredients['sharples'][0]['title'] == "Closed"):
+    sccsResponse = rq.get("http://dining.sccs.swarthmore.edu/api").json()
+    rawAPI = rq.get("https://dash.swarthmore.edu/dining_json").json()
+    meal = rawAPI['dining_center'][0]['title'].lower()
+
+    if (meal == "closed"):
         return render_template('sharplesClosed.html')
-    
-    
 
-    return render_template('index.html', title = ingredients['sharples'][0]['title'])
+    menu = {}
+    try:
+        mealList = sccsResponse['Dining Center'][meal]
+        for i in mealList:
+            if i in ['start', 'end', 'time']: 
+                continue
+            menu[i] = []
+            for j in mealList[i]:
+                # print(type(j))
+                menu[i].append(j['item'])
+    except KeyError as e:
+        return render_template('sharplesClosed.html', code="KeyError. SCCS Dining API not updated. Try again later.")
+    except Exception as e:
+        return render_template('sharplesClosed.html', code="Non-Key Error. SCCS Dining API not updated. Try again later.")
+
+
+    print(menu)
+
+    if MENURESPONSE == None:
+        MENURESPONSE = '{"hell":"yeah"}'
+        response = get_completion(menu)
+        MENURESPONSE = json.loads(response)
+        print("menuresponse defined: ", type(MENURESPONSE))
+    else:
+        print("menuresponse already exists: ", type(MENURESPONSE))
+
+    return render_template('index.html', title = str(rawAPI['dining_center'][0]['title']))
 
 
 def read_csv():
@@ -43,7 +113,7 @@ def openai_api():
     elif len(data['prompt']) > 1000:
         return jsonify(error="Prompt must be less than 1000 characters"), 400'''
 
-    
+
     CONTENT = "Given a list of menu items, you will identify the primary ingredients of each one, and return a JSON object pairing the menu item from the prompt with a comma-separated list of its main ingredients"
     PREFIX = "Return the primary ingredients of the following: "
     prompt = PREFIX + data.get('prompt')
@@ -51,14 +121,12 @@ def openai_api():
 
     MODEL = "gpt-3.5-turbo"
     try:
-        response = openai.ChatCompletion.create(
-            model=MODEL,
-            messages=[
-                {"role": "system", "content": CONTENT},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0,
-        )
+        response = client.chat.completions.create(model=MODEL,
+        messages=[
+            {"role": "system", "content": CONTENT},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0)
 
         # generated_text = response.json().get('generated_text')
 

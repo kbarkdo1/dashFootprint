@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 # from flask_limiter import Limiter
 # from flask_limiter.util import get_remote_address
-import openai
+from openai import OpenAI
+
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 from dotenv import load_dotenv
 import os
 # from flask_cors import CORS
@@ -12,7 +14,6 @@ import os
 # load env variables from .env file
 load_dotenv()
 
-openai.api_key = os.getenv("OPENAI_API_KEY")
 # @app.route('/', methods=['POST'])
 # @limiter.limit("15 per minute")
 
@@ -31,7 +32,7 @@ def openai_api():
     elif len(data['prompt']) > 1000:
         return jsonify(error="Prompt must be less than 1000 characters"), 400'''
 
-    
+
     CONTENT = "Given a list of menu items, you will identify the primary ingredients of each one, and return a JSON object pairing the menu item from the prompt with a comma-separated list of its main ingredients"
     PREFIX = "Return the primary ingredients of the following: "
     prompt = PREFIX + data.get('prompt')
@@ -39,14 +40,12 @@ def openai_api():
 
     MODEL = "gpt-3.5-turbo"
     try:
-        response = openai.ChatCompletion.create(
-            model=MODEL,
-            messages=[
-                {"role": "system", "content": CONTENT},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0,
-        )
+        response = client.chat.completions.create(model=MODEL,
+        messages=[
+            {"role": "system", "content": CONTENT},
+            {"role": "user", "content": prompt}
+        ],
+        temperature=0)
 
         # generated_text = response.json().get('generated_text')
 
